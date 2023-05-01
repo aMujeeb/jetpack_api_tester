@@ -40,13 +40,5 @@ fun TestAppWithNewLibraries() {
 
 @Composable
 fun SampleUI() {
-    
-}
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ComposeTesterXTheme {
-        TestAppWithNewLibraries()
-    }
 }

@@ -64,12 +64,3 @@ fun SplashScreen(navController: NavController?) {
         }
     }
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ComposeTesterXTheme {
-        SplashScreen(null)
-    }
-}

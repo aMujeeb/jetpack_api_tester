@@ -13,7 +13,7 @@ class LoginViewModel @Inject constructor(private val mStudentRepo: StudentDataRe
 
     fun requestStudentApi() {
         viewModelScope.launch {
-            mStudentRepo.createStudent()
+            //.createStudent()
             LoggerUtil.logMessage("Key board action Clicked")
         }
     }

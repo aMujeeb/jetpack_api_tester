@@ -71,6 +71,9 @@ fun LoginForm() {
         passwordValueState.value.trim().isNotEmpty()
     }
 
+    val openErrorDialog = rememberSaveable { mutableStateOf(false) }
+    val errorReported = rememberSaveable { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,7 +105,6 @@ fun LoginForm() {
             mKeyBoardType = KeyboardType.Password,
             mOnAction = KeyboardActions {
                 if (!isPasswordValid) return@KeyboardActions
-                mLoginViewModel.requestStudentApi()
                 emailValueState.value = ""
                 passwordValueState.value = ""
                 keyboardController?.hide()
@@ -115,7 +117,8 @@ fun LoginForm() {
                 .padding(top = 24.dp, start = 24.dp, end = 24.dp)
                 .fillMaxWidth()
         ) {
-            LoggerUtil.logMessage("Button Clicked")
+            LoggerUtil.logMessage("Button Clicked :" + emailValueState.value + "-" + passwordValueState.value)
+            mLoginViewModel.requestStudentApi()
         }
     }
 }

@@ -1,5 +1,6 @@
-package com.mujapps.composetesterx.screens
+package com.mujapps.composetesterx.screens.login
 
+import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,20 +16,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mujapps.composetesterx.R
 import com.mujapps.composetesterx.components.EmailInput
 import com.mujapps.composetesterx.components.GenericButton
-import com.mujapps.composetesterx.components.LoginHeader
+import com.mujapps.composetesterx.components.MainHeader
 import com.mujapps.composetesterx.components.PasswordInput
-import com.mujapps.composetesterx.screens.login.LoginViewModel
+import com.mujapps.composetesterx.components.TextFieldCustom
+import com.mujapps.composetesterx.navigation.TestAppScreens
 import com.mujapps.composetesterx.utils.LoggerUtil
 
 @Composable
@@ -39,9 +47,24 @@ fun LoginScreen(navController: NavController?) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LoginHeader(resourceId = R.string.login, modifier = Modifier.padding(top = 24.dp))
+            MainHeader(
+                resourceId = R.string.login,
+                modifier = Modifier.padding(top = 28.dp, bottom = 24.dp),
+                cardElevation = 0.dp
+            )
             LoginForm()
 
+            TextFieldCustom(
+                labelText = stringResource(R.string.sign_up), fontSize = 16.sp, fontWeight = FontWeight.Normal, fontFamily = FontFamily(
+                    Font(R.font.ubuntu_bold)
+                ), color = Color.Blue, modifier = Modifier.padding(top = 16.dp)
+            ) {
+                navController?.navigate(TestAppScreens.SignUpScreen.name) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+            }
         }
     }
 }
@@ -59,7 +82,9 @@ fun LoginForm() {
     }
 
     val isEmailValid = remember(emailValueState.value) {
-        emailValueState.value.trim().isNotEmpty()
+        emailValueState.value.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(
+            emailValueState.value.trim()
+        ).matches()
     }
 
     //Password Related validations and states
@@ -68,7 +93,7 @@ fun LoginForm() {
     }
 
     val isPasswordValid = remember(passwordValueState.value) {
-        passwordValueState.value.trim().isNotEmpty()
+        passwordValueState.value.isNotEmpty()
     }
 
     val openErrorDialog = rememberSaveable { mutableStateOf(false) }
@@ -77,6 +102,7 @@ fun LoginForm() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(top = 16.dp)
             .background(MaterialTheme.colors.surface)
             .verticalScroll(
                 rememberScrollState()
@@ -91,9 +117,6 @@ fun LoginForm() {
                 .padding(top = 24.dp, start = 24.dp, end = 24.dp),
             mOnAction = KeyboardActions {
                 if (!isEmailValid) return@KeyboardActions
-                //mLoginViewModel.requestStudentApi()
-                //emailValueState.value = ""
-                //keyboardController?.hide()
                 focusManager.moveFocus(FocusDirection.Down)
             }
         )

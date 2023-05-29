@@ -1,35 +1,63 @@
 package com.mujapps.composetesterx.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mujapps.composetesterx.R
 
 @Composable
-fun LoginHeader(resourceId: Int, modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(id = resourceId),
-        modifier = modifier,
-        style = MaterialTheme.typography.h1
-    )
+fun MainHeader(resourceId: Int, modifier: Modifier = Modifier, cardElevation: Dp = 0.dp) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, start = 24.dp, end = 24.dp),
+        elevation = cardElevation,
+        backgroundColor = MaterialTheme.colors.surface,
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(id = resourceId),
+                modifier = modifier,
+                style = MaterialTheme.typography.h1
+            )
+        }
+    }
 }
 
 @Composable
@@ -119,9 +147,202 @@ fun GenericButton(
             modifier = Modifier.padding(8.dp),
             style = TextStyle(
                 color = MaterialTheme.colors.surface,
-                fontSize = 14.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
             )
         )
     }
+}
+
+@Composable
+fun TextFieldSmall(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 8.sp,
+            fontWeight = FontWeight.Normal,
+            fontFamily = FontFamily(Font(R.font.ubuntu_regular))
+        )
+    )
+}
+
+@Composable
+fun TextFieldSmallBold(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 8.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily(Font(R.font.ubuntu_bold))
+        )
+    )
+}
+
+@Composable
+fun TextFieldSmallThin(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 8.sp,
+            fontWeight = FontWeight.Thin,
+            fontFamily = FontFamily(Font(R.font.ubuntu_light))
+        )
+    )
+}
+
+@Composable
+fun TextFieldRegular(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Normal,
+            fontFamily = FontFamily(Font(R.font.ubuntu_regular))
+        )
+    )
+}
+
+@Composable
+fun TextFieldRegularBold(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit = {}) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily(Font(R.font.ubuntu_bold))
+        )
+    )
+}
+
+@Composable
+fun TextFieldSRegularThin(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit = {}) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Thin,
+            fontFamily = FontFamily(Font(R.font.ubuntu_light))
+        )
+    )
+}
+
+@Composable
+fun TextFieldMedium(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            fontFamily = FontFamily(Font(R.font.ubuntu_regular))
+        )
+    )
+}
+
+@Composable
+fun TextFieldMediumBold(labelText: String, modifier: Modifier = Modifier, fColor : Color = MaterialTheme.colors.surface, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = fColor,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily(Font(R.font.ubuntu_bold))
+        )
+    )
+}
+
+@Composable
+fun TextFieldSMediumThin(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Thin,
+            fontFamily = FontFamily(Font(R.font.ubuntu_light))
+        )
+    )
+}
+
+@Composable
+fun TextFieldLarge(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Normal,
+            fontFamily = FontFamily(Font(R.font.ubuntu_regular))
+        )
+    )
+}
+
+@Composable
+fun TextFieldLargeBold(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily(Font(R.font.ubuntu_bold))
+        )
+    )
+}
+
+@Composable
+fun TextFieldLargeThin(labelText: String, modifier: Modifier = Modifier, onButtonClick: () -> Unit) {
+    Text(
+        text = labelText,
+        modifier = modifier,
+        style = TextStyle(
+            color = MaterialTheme.colors.surface,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Thin,
+            fontFamily = FontFamily(Font(R.font.ubuntu_light))
+        )
+    )
+}
+
+@Composable
+fun TextFieldCustom(
+    labelText: String,
+    fontSize: TextUnit,
+    fontWeight: FontWeight,
+    fontFamily: FontFamily,
+    modifier: Modifier = Modifier,
+    color: Color,
+    textDecoration: TextDecoration = TextDecoration.None,
+    onClick: (Int) -> Unit = {}
+) {
+    ClickableText(
+        text = AnnotatedString(labelText),
+        modifier = modifier,
+        style = TextStyle(
+            color = color,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+            fontFamily = fontFamily,
+            textDecoration = textDecoration
+        ),
+        onClick = onClick,
+    )
 }

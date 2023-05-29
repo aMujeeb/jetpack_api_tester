@@ -1,12 +1,17 @@
 package com.mujapps.composetesterx.di
 
+import android.content.Context
+import com.mujapps.composetesterx.app.ComposeApp
 import com.mujapps.composetesterx.data.StudentDataRepository
 import com.mujapps.composetesterx.data.StudentsDataApiService
+import com.mujapps.composetesterx.data.UserManager
 import com.mujapps.composetesterx.utils.StudentAppConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -19,11 +24,25 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideInterceptor(): OkHttpClient {
+    fun provideAuthInterceptor(userManager: UserManager): Interceptor {
+        return Interceptor { chain ->
+            val originalRequest = chain.request()
+            val requestBuilder = originalRequest.newBuilder()
+            val originalHeader = originalRequest.headers
+            requestBuilder.headers(originalHeader)
+            requestBuilder.header("Authorization", userManager.getAuthorization())
+            chain.proceed(requestBuilder.build())
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideInterceptor(authInterceptor: Interceptor): OkHttpClient {
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
         val builder = OkHttpClient.Builder()
         builder.addInterceptor(httpLoggingInterceptor)
+        builder.addInterceptor(authInterceptor)
         return builder.build()
     }
 
@@ -37,6 +56,6 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideStudentsDataRepository(mStudentsApiService: StudentsDataApiService) =
-        StudentDataRepository(mStudentsApiService)
+    fun provideStudentsDataRepository(mStudentsApiService: StudentsDataApiService, @ApplicationContext context: Context) =
+        StudentDataRepository(mStudentsApiService, context)
 }

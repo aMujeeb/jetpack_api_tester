@@ -1,5 +1,6 @@
 package com.mujapps.composetesterx.data
 
+import com.mujapps.composetesterx.models.MessageResponse
 import com.mujapps.composetesterx.models.Student
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -10,11 +11,11 @@ import retrofit2.http.Path
 interface StudentsDataApiService {
 
     @POST("compare_your_self")
-    suspend fun publishStudent(@Body student: Student): Any
+    suspend fun publishStudent(@Body student: Student): MessageResponse
 
     @DELETE("compare_your_self")
-    suspend fun removeStudent(): Any
+    suspend fun removeStudent(): MessageResponse
 
     @GET("compare_your_self/{type}")
-    suspend fun getStudentDetails(@Path("type") mPath: String?): List<Any>
+    suspend fun getStudentDetails(@Path("type") mPath: String?): List<Student>
 }

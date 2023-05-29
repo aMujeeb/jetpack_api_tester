@@ -37,8 +37,3 @@ fun TestAppWithNewLibraries() {
         }
     }
 }
-
-@Composable
-fun SampleUI() {
-
-}

@@ -1,0 +1,15 @@
+{
+  "IdentityManager": {
+    "Default": {
+
+    }
+  },
+  "CognitoUserPool": {
+    "Default": {
+      "PoolId": "ap-southeast-2_EHO6GcAyK",
+      "AppClientId": "4bjcepg5r43s3cbg4fk1j0vr3l",
+      "AppClientSecret": "10mo77donqt6100qh8vac997cbp5ptb8f7dh7geg05ut6kjvagmr",
+      "Region": "ap-southeast-2"
+    }
+  }
+}

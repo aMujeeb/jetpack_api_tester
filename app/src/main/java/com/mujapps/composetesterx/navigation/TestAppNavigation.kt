@@ -4,8 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.mujapps.composetesterx.screens.LoginScreen
+import com.mujapps.composetesterx.screens.login.LoginScreen
 import com.mujapps.composetesterx.screens.SplashScreen
+import com.mujapps.composetesterx.screens.sign_up.SignUpScreen
 
 @Composable
 fun TestAppNavigation() {
@@ -16,6 +17,9 @@ fun TestAppNavigation() {
         }
         composable(TestAppScreens.LoginScreen.name) {
             LoginScreen(navController = mNavController)
+        }
+        composable(TestAppScreens.SignUpScreen.name) {
+            SignUpScreen(navController = mNavController)
         }
     }
 }

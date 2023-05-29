@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">ComposeTesterX</string>
     <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="alert">Alert</string>
 </resources>

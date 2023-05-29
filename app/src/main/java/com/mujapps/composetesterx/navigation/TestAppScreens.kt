@@ -3,6 +3,7 @@ package com.mujapps.composetesterx.navigation
 enum class TestAppScreens {
     SplashScreen,
     LoginScreen,
+    SignUpScreen,
     HomeScreen;
 
     companion object {
@@ -10,6 +11,7 @@ enum class TestAppScreens {
             SplashScreen.name -> SplashScreen
             LoginScreen.name -> LoginScreen
             HomeScreen.name -> HomeScreen
+            SignUpScreen.name -> SignUpScreen
             null -> LoginScreen
             else -> throw IllegalArgumentException("Route Exception")
         }

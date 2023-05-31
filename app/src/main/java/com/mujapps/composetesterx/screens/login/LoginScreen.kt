@@ -34,7 +34,7 @@ import com.mujapps.composetesterx.R
 import com.mujapps.composetesterx.components.EmailInput
 import com.mujapps.composetesterx.components.GenericButton
 import com.mujapps.composetesterx.components.MainHeader
-import com.mujapps.composetesterx.components.PasswordInput
+import com.mujapps.composetesterx.components.GeneralTextInput
 import com.mujapps.composetesterx.components.TextFieldCustom
 import com.mujapps.composetesterx.navigation.TestAppScreens
 import com.mujapps.composetesterx.utils.LoggerUtil
@@ -121,7 +121,7 @@ fun LoginForm() {
             }
         )
 
-        PasswordInput(passwordState = passwordValueState, mModifier = Modifier
+        GeneralTextInput(textState = passwordValueState, mModifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp, start = 24.dp, end = 24.dp),
             mImeAction = ImeAction.Done,

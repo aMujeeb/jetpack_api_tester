@@ -11,9 +11,12 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHan
 import com.amazonaws.regions.Region
 import com.mujapps.composetesterx.R
 import com.mujapps.composetesterx.models.Student
+import com.mujapps.composetesterx.screens.sign_up.UserConfirmationState
 import com.mujapps.composetesterx.utils.LoggerUtil
-import dagger.hilt.android.qualifiers.ApplicationContext
-import java.lang.Exception
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class StudentDataRepository @Inject constructor(
@@ -83,20 +86,24 @@ class StudentDataRepository @Inject constructor(
 
                 override fun onFailure(exception: Exception?) {
                     LoggerUtil.logMessage("Sign Up Failure :" + exception?.message)
-                    onSignUp(Resource.Error(data = null, message = exception?.message ?: ""))
+                    onSignUp(Resource.Error(data = null, message = exception?.localizedMessage?.lastIndexOf("(")
+                        ?.let { exception?.localizedMessage?.substring(0, it) }
+                        ?: ""))
                 }
             })
     }
 
-    suspend fun verifySignUppedUser(verifyCode: String) {
+    suspend fun verifySignUppedUser(verifyCode: String, onConfirmed: (Pair<Boolean, String>) -> Unit) {
         //https://<your user pool domain>/confirmUser/?client_id=abcdefg12345678&user_name=emailtest&confirmation_code=123456
         mUser?.confirmSignUp(verifyCode, false, object : GenericHandler {
             override fun onSuccess() {
                 LoggerUtil.logMessage("User Confirmation Success")
+                onConfirmed(Pair(true, ""))
             }
 
             override fun onFailure(exception: Exception?) {
-                LoggerUtil.logMessage("User Confirmation Failure :" + exception?.message)
+                LoggerUtil.logMessage("User Confirmation Failure :" + exception.toString())
+                onConfirmed(Pair(false, exception?.message ?: ""))
             }
         })
     }

@@ -8,5 +8,6 @@ data class SignUpState(
     val isRegistered: Boolean = false,
     val navigateToRegister: Boolean = false,
     val userNameEmpty: Boolean = false,
-    val passwordEmpty: Boolean = false
+    val passwordEmpty: Boolean = false,
+    val signUpSuccess: Boolean = false
 )

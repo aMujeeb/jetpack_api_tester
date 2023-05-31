@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mujapps.composetesterx.screens.login.LoginScreen
 import com.mujapps.composetesterx.screens.SplashScreen
+import com.mujapps.composetesterx.screens.home.HomeScreen
 import com.mujapps.composetesterx.screens.sign_up.SignUpScreen
 
 @Composable
@@ -20,6 +21,9 @@ fun TestAppNavigation() {
         }
         composable(TestAppScreens.SignUpScreen.name) {
             SignUpScreen(navController = mNavController)
+        }
+        composable(TestAppScreens.HomeScreen.name) {
+            HomeScreen(navController = mNavController)
         }
     }
 }

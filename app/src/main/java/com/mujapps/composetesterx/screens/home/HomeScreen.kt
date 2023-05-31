@@ -1,4 +1,4 @@
-package com.mujapps.composetesterx.screens
+package com.mujapps.composetesterx.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

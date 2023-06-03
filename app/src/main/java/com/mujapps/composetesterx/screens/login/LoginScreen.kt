@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,12 +32,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mujapps.composetesterx.R
 import com.mujapps.composetesterx.components.EmailInput
+import com.mujapps.composetesterx.components.GeneralAlertDialog
 import com.mujapps.composetesterx.components.GenericButton
 import com.mujapps.composetesterx.components.MainHeader
 import com.mujapps.composetesterx.components.GeneralTextInput
+import com.mujapps.composetesterx.components.ShowAlertDialog
 import com.mujapps.composetesterx.components.TextFieldCustom
 import com.mujapps.composetesterx.navigation.TestAppScreens
 import com.mujapps.composetesterx.utils.LoggerUtil
@@ -52,7 +58,7 @@ fun LoginScreen(navController: NavController?) {
                 modifier = Modifier.padding(top = 28.dp, bottom = 24.dp),
                 cardElevation = 0.dp
             )
-            LoginForm()
+            LoginForm(navController)
 
             TextFieldCustom(
                 labelText = stringResource(R.string.sign_up), fontSize = 16.sp, fontWeight = FontWeight.Normal, fontFamily = FontFamily(
@@ -71,7 +77,7 @@ fun LoginScreen(navController: NavController?) {
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginForm() {
+fun LoginForm(navController: NavController?) {
     val mLoginViewModel: LoginViewModel = hiltViewModel()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -95,6 +101,9 @@ fun LoginForm() {
     val isPasswordValid = remember(passwordValueState.value) {
         passwordValueState.value.isNotEmpty()
     }
+
+    //val mLoginState by mLoginViewModel.mLoginState.collectAsState()
+    val mLoginState = mLoginViewModel.mLoginState
 
     val openErrorDialog = rememberSaveable { mutableStateOf(false) }
     val errorReported = rememberSaveable { mutableStateOf("") }
@@ -140,8 +149,24 @@ fun LoginForm() {
                 .padding(top = 24.dp, start = 24.dp, end = 24.dp)
                 .fillMaxWidth()
         ) {
+            if (!(isEmailValid && isPasswordValid)) return@GenericButton
+            keyboardController?.hide()
             LoggerUtil.logMessage("Button Clicked :" + emailValueState.value + "-" + passwordValueState.value)
-            mLoginViewModel.requestStudentApi()
+            mLoginViewModel.loginUser(emailValueState.value, passwordValueState.value)
+        }
+
+        if (mLoginState.isLoading) {
+            CircularProgressIndicator()
+        } else if (mLoginState.isSuccess) {
+            LoggerUtil.logMessage("Navigated to home")
+            mLoginViewModel.onNavigateAway()
+            navController?.navigate(TestAppScreens.HomeScreen.name) {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
+            }
+        } else if (mLoginState.errorMessage != null) {
+            ShowAlertDialog(messageBody = mLoginState.errorMessage ?: "", isShow = true)
         }
     }
 }

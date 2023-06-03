@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mujapps.composetesterx.screens.login.LoginScreen
-import com.mujapps.composetesterx.screens.SplashScreen
+import com.mujapps.composetesterx.screens.splash.SplashScreen
 import com.mujapps.composetesterx.screens.home.HomeScreen
 import com.mujapps.composetesterx.screens.sign_up.SignUpScreen
 

@@ -1,11 +1,14 @@
 package com.mujapps.composetesterx.di
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import com.mujapps.composetesterx.app.ComposeApp
 import com.mujapps.composetesterx.data.StudentDataRepository
 import com.mujapps.composetesterx.data.StudentsDataApiService
 import com.mujapps.composetesterx.data.UserManager
 import com.mujapps.composetesterx.utils.StudentAppConfig
+import com.mujapps.composetesterx.utils.StudentAppConfig.SHARED_PREFERENCES_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,4 +61,9 @@ class AppModule {
     @Provides
     fun provideStudentsDataRepository(mStudentsApiService: StudentsDataApiService, @ApplicationContext context: Context) =
         StudentDataRepository(mStudentsApiService, context)
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(@ApplicationContext app: Context): SharedPreferences =
+        app.getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE)
 }

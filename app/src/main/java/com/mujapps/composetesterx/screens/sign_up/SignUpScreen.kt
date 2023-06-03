@@ -1,6 +1,7 @@
 package com.mujapps.composetesterx.screens.sign_up
 
 import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -57,9 +59,7 @@ fun SignUpScreen(navController: NavController?) {
     }
 }
 
-
 @OptIn(ExperimentalComposeUiApi::class)
-@Preview(showBackground = true)
 @Composable
 fun SignUpForm(navController: NavController?) {
 
@@ -101,12 +101,14 @@ fun SignUpForm(navController: NavController?) {
         confirmationValueState.value.isNotEmpty() && (confirmationValueState.value.length == 6)
     }
 
-    val mSignUpState by mSignUpViewModel.mSignUpState.collectAsStateWithLifecycle()
-    val mConfirmationState by mSignUpViewModel.mSignConfirmationState.collectAsStateWithLifecycle()
+    //val mSignUpState by mSignUpViewModel.mSignUpState.collectAsStateWithLifecycle()
+    val mSignUpState = mSignUpViewModel.mSignUpState
 
     var mIsSignUpState by rememberSaveable {
         mutableStateOf(true)
     }
+
+    val mContext = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -198,11 +200,16 @@ fun SignUpForm(navController: NavController?) {
                 confirmationValueState.value = ""
                 keyboardController?.hide()
             }
-            if (mSignUpState.signUpSuccess) {
+
+            if (mSignUpState.isLoading) {
+                CircularProgressIndicator()
+            } else if (mSignUpState.signUpSuccess) {
                 LoggerUtil.logMessage("Hit SignUpSuccess")
-                navController?.navigate(TestAppScreens.HomeScreen.name) {
+                //Toast.makeText(mContext, stringResource(id = R.string.confirmation_success), Toast.LENGTH_SHORT).show()
+                mSignUpViewModel.onNavigateAway()
+                navController?.navigate(TestAppScreens.LoginScreen.name) {
                     popUpTo(navController.graph.id) {
-                        inclusive = true
+                        inclusive = false
                     }
                 }
             }

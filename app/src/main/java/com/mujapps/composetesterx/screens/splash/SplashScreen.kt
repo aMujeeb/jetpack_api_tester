@@ -1,4 +1,4 @@
-package com.mujapps.composetesterx.screens
+package com.mujapps.composetesterx.screens.splash
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
@@ -19,13 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.mujapps.composetesterx.navigation.TestAppScreens
 import com.mujapps.composetesterx.ui.theme.ComposeTesterXTheme
+import com.mujapps.composetesterx.utils.LoggerUtil
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController?) {
+fun SplashScreen(navController: NavController?, mSplashVieModel: SplashScreenViewModel = hiltViewModel()) {
     //Text(text = "Screen Splash")
 
     val mScale = remember {
@@ -37,13 +40,7 @@ fun SplashScreen(navController: NavController?) {
         mScale.animateTo(targetValue = 0.9f, animationSpec = tween(durationMillis = 800, easing = {
             OvershootInterpolator(8f).getInterpolation(it)
         }))
-        delay(2000L)
-        //Navigate to Login screen -> This will facilitate back navigation not come back to
-        navController?.navigate(TestAppScreens.LoginScreen.name) {
-            popUpTo(navController.graph.id) {
-                inclusive = true
-            }
-        }
+        delay(3000L)
     }
 
     Surface(
@@ -62,5 +59,25 @@ fun SplashScreen(navController: NavController?) {
         ) {
             Text(text = "Screen Splash", style = MaterialTheme.typography.body1, fontSize = 20.sp)
         }
+
+        mSplashVieModel.checkIsUserLoggedIn()
+
+        if (mSplashVieModel.mSplashState.isUserExists == false) {
+            //Navigate to Login screen -> This will facilitate back navigation not come back to
+            navController?.navigate(TestAppScreens.LoginScreen.name) {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
+            }
+        } else {
+            //Navigate to Login screen -> This will facilitate back navigation not come back to
+            navController?.navigate(TestAppScreens.HomeScreen.name) {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
+            }
+        }
+        LoggerUtil.logMessage("Splash Screen Mechanism")
+        mSplashVieModel.onNavigateAway()
     }
 }

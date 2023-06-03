@@ -9,4 +9,5 @@
     <string name="error">Error</string>
     <string name="confirmation_code">Confirmation Code</string>
     <string name="confirmation">Confirmation</string>
+    <string name="confirmation_success">User Confirmation</string>
 </resources>

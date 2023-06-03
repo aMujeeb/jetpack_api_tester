@@ -1,22 +1,28 @@
 package com.mujapps.composetesterx.data
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.amazonaws.mobile.config.AWSConfiguration
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationDetails
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler
 import com.amazonaws.regions.Region
 import com.mujapps.composetesterx.R
+import com.mujapps.composetesterx.models.LoginStatus
 import com.mujapps.composetesterx.models.Student
-import com.mujapps.composetesterx.screens.sign_up.UserConfirmationState
 import com.mujapps.composetesterx.utils.LoggerUtil
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 class StudentDataRepository @Inject constructor(
@@ -56,11 +62,12 @@ class StudentDataRepository @Inject constructor(
     private lateinit var mCognitoUserPool: CognitoUserPool
     private lateinit var mCognitoAwsConfiguration: AWSConfiguration
     private lateinit var mCognitoUserAttributes: CognitoUserAttributes
+    private lateinit var mCognitoUser: CognitoUser
     private var mRegion: Region = Region.getRegion("ap-southeast-2")
     private var mUserId = ""
     private var mUser: CognitoUser? = null
 
-    suspend fun signUpUser(userEmail: String, password: String, onSignUp: (Resource<Any>) -> Unit) {
+    fun signUpUser(userEmail: String, password: String, onSignUp: (Resource<Any>) -> Unit) {
         mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
         mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
         mCognitoUserAttributes = CognitoUserAttributes()
@@ -93,9 +100,9 @@ class StudentDataRepository @Inject constructor(
             })
     }
 
-    suspend fun verifySignUppedUser(verifyCode: String, onConfirmed: (Pair<Boolean, String>) -> Unit) {
+    fun verifySignUppedUser(verifyCode: String, onConfirmed: (Pair<Boolean, String>) -> Unit) {
         //https://<your user pool domain>/confirmUser/?client_id=abcdefg12345678&user_name=emailtest&confirmation_code=123456
-        mUser?.confirmSignUp(verifyCode, false, object : GenericHandler {
+        mUser?.confirmSignUpInBackground(verifyCode, false, object : GenericHandler {
             override fun onSuccess() {
                 LoggerUtil.logMessage("User Confirmation Success")
                 onConfirmed(Pair(true, ""))
@@ -104,6 +111,64 @@ class StudentDataRepository @Inject constructor(
             override fun onFailure(exception: Exception?) {
                 LoggerUtil.logMessage("User Confirmation Failure :" + exception.toString())
                 onConfirmed(Pair(false, exception?.message ?: ""))
+            }
+        })
+    }
+
+    fun loginUser(userEmail: String, password: String, onLoginRequest: (LoginStatus) -> Unit) {
+        mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
+        mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
+        mCognitoUser = mCognitoUserPool.getUser(userEmail)
+        mCognitoUser.getSessionInBackground(object : AuthenticationHandler {
+            override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
+                LoggerUtil.logMessage("User Login Success")
+                LoggerUtil.logMessage("User Login Access Token :" + userSession?.accessToken)
+                LoggerUtil.logMessage("User Login Is Valid :" + userSession?.isValid)
+                LoggerUtil.logMessage(("User Login Refresh Token :" + userSession?.refreshToken?.token) ?: "")
+                onLoginRequest(
+                    LoginStatus(
+                        mLoginFailed = false,
+                        mIsValid = userSession?.isValid ?: false,
+                        mSessionToken = userSession?.accessToken?.jwtToken ?: "",
+                        mRefreshToken = userSession?.refreshToken?.token,
+                        mUserId = userSession?.accessToken?.username ?: "",
+                        mExpiredTime = userSession?.accessToken?.expiration
+                    )
+                )
+            }
+
+            override fun getAuthenticationDetails(authenticationContinuation: AuthenticationContinuation?, userId: String?) {
+                val authenticationDetails = AuthenticationDetails(userEmail, password, null)
+                authenticationContinuation?.setAuthenticationDetails(authenticationDetails)
+                authenticationContinuation?.continueTask()
+            }
+
+            override fun getMFACode(continuation: MultiFactorAuthenticationContinuation?) {}
+
+            override fun authenticationChallenge(continuation: ChallengeContinuation?) {
+                LoggerUtil.logMessage("User Authentication Challenged :" + continuation.toString())
+            }
+
+            override fun onFailure(exception: Exception?) {
+                LoggerUtil.logMessage("User Login Failure :$exception")
+                onLoginRequest(LoginStatus(mLoginFailed = true, mError = exception?.message ?: ""))
+            }
+        })
+    }
+
+    fun getCurrentUser(userEmail: String, isAlreadyLoggedIn : (Boolean) -> Unit) {
+        mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
+        mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
+        mCognitoUser = mCognitoUserPool.getUser(userEmail)
+        mCognitoUser.getDetailsInBackground(object : GetDetailsHandler {
+            override fun onSuccess(cognitoUserDetails: CognitoUserDetails?) {
+                LoggerUtil.logMessage("Check For User Success :" + cognitoUserDetails?.attributes?.attributes.toString())
+                isAlreadyLoggedIn(true)
+            }
+
+            override fun onFailure(exception: Exception?) {
+                LoggerUtil.logMessage("Check For User Failed:$exception")
+                isAlreadyLoggedIn(false)
             }
         })
     }

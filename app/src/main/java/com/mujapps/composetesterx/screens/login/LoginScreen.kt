@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -135,6 +136,7 @@ fun LoginForm(navController: NavController?) {
             .padding(top = 20.dp, start = 24.dp, end = 24.dp),
             mImeAction = ImeAction.Done,
             mKeyBoardType = KeyboardType.Password,
+            mVisualTransformation = PasswordVisualTransformation(),
             mOnAction = KeyboardActions {
                 if (!isPasswordValid) return@KeyboardActions
                 emailValueState.value = ""

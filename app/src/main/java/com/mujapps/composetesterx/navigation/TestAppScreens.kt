@@ -4,7 +4,8 @@ enum class TestAppScreens {
     SplashScreen,
     LoginScreen,
     SignUpScreen,
-    HomeScreen;
+    HomeScreen,
+    AddStudentScreen;
 
     companion object {
         fun fromRoute(route: String): TestAppScreens = when (route.substringBefore("/")) {
@@ -12,6 +13,7 @@ enum class TestAppScreens {
             LoginScreen.name -> LoginScreen
             HomeScreen.name -> HomeScreen
             SignUpScreen.name -> SignUpScreen
+            AddStudentScreen.name -> AddStudentScreen
             null -> LoginScreen
             else -> throw IllegalArgumentException("Route Exception")
         }

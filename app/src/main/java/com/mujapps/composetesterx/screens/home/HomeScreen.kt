@@ -4,20 +4,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.mujapps.composetesterx.TestAppWithNewLibraries
-import com.mujapps.composetesterx.ui.theme.ComposeTesterXTheme
+import com.mujapps.composetesterx.R
+import com.mujapps.composetesterx.components.GenericButton
+import com.mujapps.composetesterx.components.ShowAlertDialog
+import com.mujapps.composetesterx.components.StudentListItem
+import com.mujapps.composetesterx.components.TextFieldMediumBold
+import com.mujapps.composetesterx.components.showToast
+import com.mujapps.composetesterx.models.Student
+import com.mujapps.composetesterx.navigation.TestAppScreens
 
 @Composable
 fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewModel = hiltViewModel()) {
+
+    val mHomeViewState = mHomeViewModel.mHomeViewState
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -25,9 +36,56 @@ fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewMode
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Home View")
+            TextFieldMediumBold(labelText = stringResource(id = R.string.student_details), modifier = Modifier.padding(top = 24.dp))
 
-            mHomeViewModel.checkTokens()
+            // Student List Area
+            if (mHomeViewState.isLoading) {
+                CircularProgressIndicator()
+            } else if (mHomeViewState.isSuccess) {
+                StudentList(mHomeViewState.data ?: emptyList(), mHomeViewModel)
+            } else if (mHomeViewState.errorMessage.isNullOrEmpty().not()) {
+                ShowAlertDialog(messageBody = mHomeViewState.errorMessage ?: "", isShow = true)
+            } else if (mHomeViewState.isStudentDeleted) {
+                ShowAlertDialog(messageBody = stringResource(id = R.string.deletion_success), isShow = true)
+            }
+
+            GenericButton(
+                labelText = stringResource(id = R.string.click_to_add_student),
+                isLoading = false,
+                mModifier = Modifier.padding(top = 24.dp)
+            ) {
+                mHomeViewModel.onNavigateAway()
+                navController?.navigate(TestAppScreens.AddStudentScreen.name) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+            }
+
+            //mHomeViewModel.checkTokens()
+        }
+    }
+}
+
+@Composable
+fun StudentList(studentsList: List<Student>, mHomeViewModel: HomeScreenViewModel) {
+    val mContext = LocalContext.current
+    if (studentsList.isEmpty()) {
+        Surface(
+            modifier = Modifier
+                .padding(24.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                TextFieldMediumBold(labelText = stringResource(id = R.string.no_students_message), fColor = MaterialTheme.colors.secondary)
+            }
+        }
+    } else {
+        for (student in studentsList) {
+            StudentListItem(student) {
+                //On Click to show toast
+                showToast(mContext, it)
+                mHomeViewModel.onDeleteStudent()
+            }
         }
     }
 }

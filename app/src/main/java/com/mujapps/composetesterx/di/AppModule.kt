@@ -33,7 +33,7 @@ class AppModule {
             val requestBuilder = originalRequest.newBuilder()
             val originalHeader = originalRequest.headers
             requestBuilder.headers(originalHeader)
-            requestBuilder.header("Authorization", userManager.getAuthorization())
+            requestBuilder.header("Authorization", userManager.getAuthorization() ?: "")
             chain.proceed(requestBuilder.build())
         }
     }

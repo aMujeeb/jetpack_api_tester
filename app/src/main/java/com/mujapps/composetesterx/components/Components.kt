@@ -1,9 +1,16 @@
 package com.mujapps.composetesterx.components
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,10 +19,14 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +50,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mujapps.composetesterx.R
+import com.mujapps.composetesterx.models.Student
 
 @Composable
 fun MainHeader(resourceId: Int, modifier: Modifier = Modifier, cardElevation: Dp = 0.dp) {
@@ -92,7 +104,8 @@ fun GeneralTextInput(
     mIsEnabled: Boolean = true,
     mImeAction: ImeAction,
     mKeyBoardType: KeyboardType,
-    mOnAction: KeyboardActions = KeyboardActions.Default
+    mOnAction: KeyboardActions = KeyboardActions.Default,
+    mVisualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     InputField(
         valueState = textState,
@@ -101,7 +114,7 @@ fun GeneralTextInput(
         isEnabled = mIsEnabled,
         mImeAction = mImeAction,
         onAction = mOnAction, keyBoardType = mKeyBoardType,
-        mVisualTransformation = PasswordVisualTransformation()
+        mVisualTransformation = mVisualTransformation
     )
 }
 
@@ -178,7 +191,7 @@ fun GeneralAlertDialog(messageBody: String, mModifier: Modifier = Modifier, onBu
 }
 
 @Composable
-fun TextFieldSmall(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldSmall(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit = {}) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -192,7 +205,12 @@ fun TextFieldSmall(labelText: String, modifier: Modifier = Modifier, fColor: Col
 }
 
 @Composable
-fun TextFieldSmallBold(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldSmallBold(
+    labelText: String,
+    modifier: Modifier = Modifier,
+    fColor: Color = MaterialTheme.colors.onSurface,
+    onButtonClick: () -> Unit = {}
+) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -206,7 +224,12 @@ fun TextFieldSmallBold(labelText: String, modifier: Modifier = Modifier, fColor:
 }
 
 @Composable
-fun TextFieldSmallThin(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldSmallThin(
+    labelText: String,
+    modifier: Modifier = Modifier,
+    fColor: Color = MaterialTheme.colors.onSurface,
+    onButtonClick: () -> Unit = {}
+) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -220,7 +243,12 @@ fun TextFieldSmallThin(labelText: String, modifier: Modifier = Modifier, fColor:
 }
 
 @Composable
-fun TextFieldRegular(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldRegular(
+    labelText: String,
+    modifier: Modifier = Modifier,
+    fColor: Color = MaterialTheme.colors.onSurface,
+    onButtonClick: () -> Unit = {}
+) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -272,7 +300,12 @@ fun TextFieldSRegularThin(
 }
 
 @Composable
-fun TextFieldMedium(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldMedium(
+    labelText: String,
+    modifier: Modifier = Modifier,
+    fColor: Color = MaterialTheme.colors.onSurface,
+    onButtonClick: () -> Unit = {}
+) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -286,7 +319,12 @@ fun TextFieldMedium(labelText: String, modifier: Modifier = Modifier, fColor: Co
 }
 
 @Composable
-fun TextFieldMediumBold(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldMediumBold(
+    labelText: String,
+    modifier: Modifier = Modifier,
+    fColor: Color = MaterialTheme.colors.onSurface,
+    onButtonClick: () -> Unit = {}
+) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -304,7 +342,7 @@ fun TextFieldSMediumThin(
     labelText: String,
     modifier: Modifier = Modifier,
     fColor: Color = MaterialTheme.colors.onSurface,
-    onButtonClick: () -> Unit
+    onButtonClick: () -> Unit = {}
 ) {
     Text(
         text = labelText,
@@ -319,7 +357,7 @@ fun TextFieldSMediumThin(
 }
 
 @Composable
-fun TextFieldLarge(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldLarge(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit = {}) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -333,7 +371,12 @@ fun TextFieldLarge(labelText: String, modifier: Modifier = Modifier, fColor: Col
 }
 
 @Composable
-fun TextFieldLargeBold(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldLargeBold(
+    labelText: String,
+    modifier: Modifier = Modifier,
+    fColor: Color = MaterialTheme.colors.onSurface,
+    onButtonClick: () -> Unit = {}
+) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -347,7 +390,12 @@ fun TextFieldLargeBold(labelText: String, modifier: Modifier = Modifier, fColor:
 }
 
 @Composable
-fun TextFieldLargeThin(labelText: String, modifier: Modifier = Modifier, fColor: Color = MaterialTheme.colors.onSurface, onButtonClick: () -> Unit) {
+fun TextFieldLargeThin(
+    labelText: String,
+    modifier: Modifier = Modifier,
+    fColor: Color = MaterialTheme.colors.onSurface,
+    onButtonClick: () -> Unit = {}
+) {
     Text(
         text = labelText,
         modifier = modifier,
@@ -413,4 +461,38 @@ fun ShowAlertDialog(isShow: Boolean, title: String = stringResource(id = R.strin
             }
         )
     }
+}
+
+@Composable
+fun StudentListItem(student: Student, onPressStudent: (String) -> Unit = {}) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.colors.surface,
+        elevation = 4.dp,
+        modifier = Modifier
+            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+            .clickable { onPressStudent.invoke(student.age.toString()) }) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    imageVector = Icons.Rounded.Person,
+                    contentDescription = stringResource(id = R.string.student_image),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .height(24.dp)
+                        .width(24.dp)
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                TextFieldMedium(labelText = student.age.toString(), modifier = Modifier.padding(4.dp))
+                TextFieldMedium(labelText = student.height.toString(), modifier = Modifier.padding(4.dp))
+                TextFieldMedium(labelText = student.income.toString(), modifier = Modifier.padding(4.dp))
+            }
+        }
+    }
+}
+
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }

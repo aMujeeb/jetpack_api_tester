@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mujapps.composetesterx.screens.add_student.AddStudentScreen
 import com.mujapps.composetesterx.screens.login.LoginScreen
 import com.mujapps.composetesterx.screens.splash.SplashScreen
 import com.mujapps.composetesterx.screens.home.HomeScreen
@@ -24,6 +25,9 @@ fun TestAppNavigation() {
         }
         composable(TestAppScreens.HomeScreen.name) {
             HomeScreen(navController = mNavController)
+        }
+        composable(TestAppScreens.AddStudentScreen.name) {
+            AddStudentScreen(navController = mNavController)
         }
     }
 }

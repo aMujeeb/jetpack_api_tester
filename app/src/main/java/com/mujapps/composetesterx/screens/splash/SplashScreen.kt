@@ -41,6 +41,8 @@ fun SplashScreen(navController: NavController?, mSplashVieModel: SplashScreenVie
             OvershootInterpolator(8f).getInterpolation(it)
         }))
         delay(3000L)
+        mSplashVieModel.checkIsUserLoggedIn()
+        LoggerUtil.logMessage("Splash Screen Mechanism")
     }
 
     Surface(
@@ -60,24 +62,24 @@ fun SplashScreen(navController: NavController?, mSplashVieModel: SplashScreenVie
             Text(text = "Screen Splash", style = MaterialTheme.typography.body1, fontSize = 20.sp)
         }
 
-        mSplashVieModel.checkIsUserLoggedIn()
-
         if (mSplashVieModel.mSplashState.isUserExists == false) {
             //Navigate to Login screen -> This will facilitate back navigation not come back to
+            mSplashVieModel.onNavigateAway()
+            LoggerUtil.logMessage("Navigate to login")
             navController?.navigate(TestAppScreens.LoginScreen.name) {
                 popUpTo(navController.graph.id) {
                     inclusive = true
                 }
             }
-        } else {
+        } else if (mSplashVieModel.mSplashState.isUserExists == true){
             //Navigate to Login screen -> This will facilitate back navigation not come back to
+            mSplashVieModel.onNavigateAway()
+            LoggerUtil.logMessage("Navigate to Home")
             navController?.navigate(TestAppScreens.HomeScreen.name) {
                 popUpTo(navController.graph.id) {
                     inclusive = true
                 }
             }
         }
-        LoggerUtil.logMessage("Splash Screen Mechanism")
-        mSplashVieModel.onNavigateAway()
     }
 }

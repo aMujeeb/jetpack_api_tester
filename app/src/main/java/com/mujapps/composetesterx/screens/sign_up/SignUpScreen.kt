@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -138,6 +139,7 @@ fun SignUpForm(navController: NavController?) {
                 mImeAction = ImeAction.Next,
                 mKeyBoardType = KeyboardType.Password,
                 mLabelId = stringResource(id = R.string.password),
+                mVisualTransformation = PasswordVisualTransformation(),
                 mOnAction = KeyboardActions {
                     if (!isPasswordValid) return@KeyboardActions
                     focusManager.moveFocus(FocusDirection.Down)
@@ -148,6 +150,7 @@ fun SignUpForm(navController: NavController?) {
                 .padding(top = 20.dp, start = 24.dp, end = 24.dp),
                 mImeAction = ImeAction.Done,
                 mKeyBoardType = KeyboardType.Password,
+                mVisualTransformation = PasswordVisualTransformation(),
                 mLabelId = stringResource(id = R.string.confirm_password),
                 mOnAction = KeyboardActions {
                     if (!isConfirmPasswordValid) return@KeyboardActions

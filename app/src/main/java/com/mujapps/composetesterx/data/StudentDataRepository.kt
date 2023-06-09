@@ -39,7 +39,7 @@ class StudentDataRepository @Inject constructor(
         return Resource.Success(data = response)
     }
 
-    suspend fun deleteStudent(): Any {
+    suspend fun deleteStudent(): Resource<Any> {
         val response = try {
             Resource.Loading(data = true)
             mStudentsApiService.removeStudent()
@@ -49,7 +49,7 @@ class StudentDataRepository @Inject constructor(
         return Resource.Success(data = response)
     }
 
-    suspend fun getStudent(path: String?): Any {
+    suspend fun getStudent(path: String?): Resource<Any> {
         val response = try {
             Resource.Loading(data = true)
             mStudentsApiService.getStudentDetails(path)
@@ -67,9 +67,12 @@ class StudentDataRepository @Inject constructor(
     private var mUserId = ""
     private var mUser: CognitoUser? = null
 
-    fun signUpUser(userEmail: String, password: String, onSignUp: (Resource<Any>) -> Unit) {
+    init {
         mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
         mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
+    }
+
+    fun signUpUser(userEmail: String, password: String, onSignUp: (Resource<Any>) -> Unit) {
         mCognitoUserAttributes = CognitoUserAttributes()
         mCognitoUserAttributes.addAttribute("email", userEmail)
         mCognitoUserPool.signUpInBackground(
@@ -94,7 +97,7 @@ class StudentDataRepository @Inject constructor(
                 override fun onFailure(exception: Exception?) {
                     LoggerUtil.logMessage("Sign Up Failure :" + exception?.message)
                     onSignUp(Resource.Error(data = null, message = exception?.localizedMessage?.lastIndexOf("(")
-                        ?.let { exception?.localizedMessage?.substring(0, it) }
+                        ?.let { exception.localizedMessage?.substring(0, it) }
                         ?: ""))
                 }
             })
@@ -116,20 +119,21 @@ class StudentDataRepository @Inject constructor(
     }
 
     fun loginUser(userEmail: String, password: String, onLoginRequest: (LoginStatus) -> Unit) {
-        mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
-        mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
+        //mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
+        //mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
         mCognitoUser = mCognitoUserPool.getUser(userEmail)
         mCognitoUser.getSessionInBackground(object : AuthenticationHandler {
             override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
                 LoggerUtil.logMessage("User Login Success")
-                LoggerUtil.logMessage("User Login Access Token :" + userSession?.accessToken)
+                LoggerUtil.logMessage("User Login Access Token :" + userSession?.idToken?.jwtToken)
                 LoggerUtil.logMessage("User Login Is Valid :" + userSession?.isValid)
                 LoggerUtil.logMessage(("User Login Refresh Token :" + userSession?.refreshToken?.token) ?: "")
+                LoggerUtil.logMessage("User Login Token Type :" + userSession?.accessToken?.jwtToken)
                 onLoginRequest(
                     LoginStatus(
                         mLoginFailed = false,
                         mIsValid = userSession?.isValid ?: false,
-                        mSessionToken = userSession?.accessToken?.jwtToken ?: "",
+                        mSessionToken = userSession?.idToken?.jwtToken ?: "",
                         mRefreshToken = userSession?.refreshToken?.token,
                         mUserId = userSession?.accessToken?.username ?: "",
                         mExpiredTime = userSession?.accessToken?.expiration
@@ -156,10 +160,8 @@ class StudentDataRepository @Inject constructor(
         })
     }
 
-    fun getCurrentUser(userEmail: String, isAlreadyLoggedIn : (Boolean) -> Unit) {
-        mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
-        mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
-        mCognitoUser = mCognitoUserPool.getUser(userEmail)
+    fun getCurrentUser(isAlreadyLoggedIn: (Boolean) -> Unit) {
+        mCognitoUser = mCognitoUserPool.currentUser
         mCognitoUser.getDetailsInBackground(object : GetDetailsHandler {
             override fun onSuccess(cognitoUserDetails: CognitoUserDetails?) {
                 LoggerUtil.logMessage("Check For User Success :" + cognitoUserDetails?.attributes?.attributes.toString())
@@ -169,6 +171,44 @@ class StudentDataRepository @Inject constructor(
             override fun onFailure(exception: Exception?) {
                 LoggerUtil.logMessage("Check For User Failed:$exception")
                 isAlreadyLoggedIn(false)
+            }
+        })
+    }
+
+    fun getAuthenticatedUser(isAlreadyLoggedIn: (Boolean) -> Unit) {
+        mCognitoUser = mCognitoUserPool.currentUser
+        if (mCognitoUser.userId.isNullOrEmpty()) isAlreadyLoggedIn(false)
+        else {
+            mCognitoUser.getSessionInBackground(object : AuthenticationHandler {
+                override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
+                    LoggerUtil.logMessage("User Is Valid :" + userSession?.isValid)
+                    LoggerUtil.logMessage("User Is Valid Threshold:" + userSession?.isValidForThreshold)
+                    isAlreadyLoggedIn(userSession?.isValid ?: false)
+                }
+
+                override fun getAuthenticationDetails(authenticationContinuation: AuthenticationContinuation?, userId: String?) {
+
+                }
+
+                override fun getMFACode(continuation: MultiFactorAuthenticationContinuation?) {}
+
+                override fun authenticationChallenge(continuation: ChallengeContinuation?) {}
+
+                override fun onFailure(exception: java.lang.Exception?) {
+                    isAlreadyLoggedIn(false)
+                }
+            })
+        }
+    }
+
+    fun logOutUser(isLoggedOutSuccess: (Boolean) -> Unit) {
+        mCognitoUser.globalSignOutInBackground(object : GenericHandler {
+            override fun onSuccess() {
+                isLoggedOutSuccess(true)
+            }
+
+            override fun onFailure(exception: java.lang.Exception?) {
+                isLoggedOutSuccess(false)
             }
         })
     }

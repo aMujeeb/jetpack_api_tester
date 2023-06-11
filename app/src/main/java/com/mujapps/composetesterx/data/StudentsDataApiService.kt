@@ -1,5 +1,6 @@
 package com.mujapps.composetesterx.data
 
+import com.mujapps.composetesterx.data.dao.ConfigurationsDao
 import com.mujapps.composetesterx.models.MessageResponse
 import com.mujapps.composetesterx.models.Student
 import retrofit2.http.Body
@@ -18,4 +19,7 @@ interface StudentsDataApiService {
 
     @GET("compare_your_self/{type}")
     suspend fun getStudentDetails(@Path("type") mPath: String?): List<Student>
+
+    @GET("configs")
+    suspend fun getConfigurations(): ConfigurationsDao
 }

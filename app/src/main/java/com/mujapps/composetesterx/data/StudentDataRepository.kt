@@ -1,7 +1,6 @@
 package com.mujapps.composetesterx.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.amazonaws.mobile.config.AWSConfiguration
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser
@@ -19,10 +18,15 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHa
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler
 import com.amazonaws.regions.Region
-import com.mujapps.composetesterx.R
+import com.amazonaws.regions.Regions
+import com.mujapps.composetesterx.models.Configuration
 import com.mujapps.composetesterx.models.LoginStatus
 import com.mujapps.composetesterx.models.Student
 import com.mujapps.composetesterx.utils.LoggerUtil
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class StudentDataRepository @Inject constructor(
@@ -59,6 +63,20 @@ class StudentDataRepository @Inject constructor(
         return Resource.Success(data = response)
     }
 
+    suspend fun getConfigs(): Flow<Resource<Configuration>> = flow {
+        try {
+            emit(Resource.Loading<Configuration>())
+            val configs = mStudentsApiService.getConfigurations().getConfigurations()
+            setConfigs(configs)
+            emit(Resource.Success<Configuration>(configs))
+        } catch (e: HttpException) {
+            emit(Resource.Error<Configuration>(e.message))
+        } catch (e: IOException) {
+            emit(Resource.Error<Configuration>(e.message))
+        }
+    }
+
+    private lateinit var mConfiguration: Configuration
     private lateinit var mCognitoUserPool: CognitoUserPool
     private lateinit var mCognitoAwsConfiguration: AWSConfiguration
     private lateinit var mCognitoUserAttributes: CognitoUserAttributes
@@ -68,11 +86,19 @@ class StudentDataRepository @Inject constructor(
     private var mUser: CognitoUser? = null
 
     init {
-        mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
-        mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
+        //mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
+        // mCognitoAwsConfiguration.
+        //CognitoUserPool(Context context, String userPoolId, String clientId, String clientSecret, Regions region)
+        //mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
+    }
+
+    private fun setConfigs(configs: Configuration) {
+        mCognitoUserPool =
+            CognitoUserPool(mAppContext, configs.mPoolId, configs.mClientId, configs.mClientSecret, Regions.AP_SOUTHEAST_2)
     }
 
     fun signUpUser(userEmail: String, password: String, onSignUp: (Resource<Any>) -> Unit) {
+        //mCognitoUserPool = CognitoUserPool(mAppContext, mConfiguration.mPoolId, mConfiguration.mClientId, mConfiguration.mClientSecret, Regions.AP_SOUTHEAST_2)
         mCognitoUserAttributes = CognitoUserAttributes()
         mCognitoUserAttributes.addAttribute("email", userEmail)
         mCognitoUserPool.signUpInBackground(

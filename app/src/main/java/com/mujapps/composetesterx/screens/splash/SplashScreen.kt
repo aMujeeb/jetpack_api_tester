@@ -41,7 +41,8 @@ fun SplashScreen(navController: NavController?, mSplashVieModel: SplashScreenVie
             OvershootInterpolator(8f).getInterpolation(it)
         }))
         delay(3000L)
-        mSplashVieModel.checkIsUserLoggedIn()
+        mSplashVieModel.requestConfigurations()
+        //mSplashVieModel.checkIsUserLoggedIn()
         LoggerUtil.logMessage("Splash Screen Mechanism")
     }
 
@@ -71,7 +72,7 @@ fun SplashScreen(navController: NavController?, mSplashVieModel: SplashScreenVie
                     inclusive = true
                 }
             }
-        } else if (mSplashVieModel.mSplashState.isUserExists == true){
+        } else if (mSplashVieModel.mSplashState.isUserExists == true) {
             //Navigate to Login screen -> This will facilitate back navigation not come back to
             mSplashVieModel.onNavigateAway()
             LoggerUtil.logMessage("Navigate to Home")

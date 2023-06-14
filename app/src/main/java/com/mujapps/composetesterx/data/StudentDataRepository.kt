@@ -1,7 +1,6 @@
 package com.mujapps.composetesterx.data
 
 import android.content.Context
-import com.amazonaws.mobile.config.AWSConfiguration
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes
@@ -17,10 +16,10 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler
-import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
 import com.mujapps.composetesterx.models.Configuration
 import com.mujapps.composetesterx.models.LoginStatus
+import com.mujapps.composetesterx.models.MessageResponse
 import com.mujapps.composetesterx.models.Student
 import com.mujapps.composetesterx.utils.LoggerUtil
 import kotlinx.coroutines.flow.Flow
@@ -43,14 +42,16 @@ class StudentDataRepository @Inject constructor(
         return Resource.Success(data = response)
     }
 
-    suspend fun deleteStudent(): Resource<Any> {
-        val response = try {
-            Resource.Loading(data = true)
-            mStudentsApiService.removeStudent()
-        } catch (e: Exception) {
-            return Resource.Error(message = e.message.toString(), data = null)
+    fun deleteStudent(studentId : String) : Flow<Resource<MessageResponse>> = flow {
+        try {
+            emit(Resource.Loading<MessageResponse>())
+            val response = mStudentsApiService.removeStudent(studentId)
+            emit(Resource.Success<MessageResponse>(response))
+        } catch (e: HttpException) {
+            emit(Resource.Error<MessageResponse>(e.message))
+        } catch (e: IOException) {
+            emit(Resource.Error<MessageResponse>(e.message))
         }
-        return Resource.Success(data = response)
     }
 
     suspend fun getStudent(path: String?): Resource<Any> {
@@ -76,21 +77,11 @@ class StudentDataRepository @Inject constructor(
         }
     }
 
-    private lateinit var mConfiguration: Configuration
     private lateinit var mCognitoUserPool: CognitoUserPool
-    private lateinit var mCognitoAwsConfiguration: AWSConfiguration
     private lateinit var mCognitoUserAttributes: CognitoUserAttributes
     private lateinit var mCognitoUser: CognitoUser
-    private var mRegion: Region = Region.getRegion("ap-southeast-2")
     private var mUserId = ""
     private var mUser: CognitoUser? = null
-
-    init {
-        //mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
-        // mCognitoAwsConfiguration.
-        //CognitoUserPool(Context context, String userPoolId, String clientId, String clientSecret, Regions region)
-        //mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
-    }
 
     private fun setConfigs(configs: Configuration) {
         mCognitoUserPool =
@@ -98,7 +89,6 @@ class StudentDataRepository @Inject constructor(
     }
 
     fun signUpUser(userEmail: String, password: String, onSignUp: (Resource<Any>) -> Unit) {
-        //mCognitoUserPool = CognitoUserPool(mAppContext, mConfiguration.mPoolId, mConfiguration.mClientId, mConfiguration.mClientSecret, Regions.AP_SOUTHEAST_2)
         mCognitoUserAttributes = CognitoUserAttributes()
         mCognitoUserAttributes.addAttribute("email", userEmail)
         mCognitoUserPool.signUpInBackground(
@@ -145,16 +135,14 @@ class StudentDataRepository @Inject constructor(
     }
 
     fun loginUser(userEmail: String, password: String, onLoginRequest: (LoginStatus) -> Unit) {
-        //mCognitoAwsConfiguration = AWSConfiguration(mAppContext, R.raw.aws_config)
-        //mCognitoUserPool = CognitoUserPool(mAppContext, mCognitoAwsConfiguration)
         mCognitoUser = mCognitoUserPool.getUser(userEmail)
         mCognitoUser.getSessionInBackground(object : AuthenticationHandler {
             override fun onSuccess(userSession: CognitoUserSession?, newDevice: CognitoDevice?) {
-                LoggerUtil.logMessage("User Login Success")
+                /*LoggerUtil.logMessage("User Login Success")
                 LoggerUtil.logMessage("User Login Access Token :" + userSession?.idToken?.jwtToken)
                 LoggerUtil.logMessage("User Login Is Valid :" + userSession?.isValid)
                 LoggerUtil.logMessage(("User Login Refresh Token :" + userSession?.refreshToken?.token) ?: "")
-                LoggerUtil.logMessage("User Login Token Type :" + userSession?.accessToken?.jwtToken)
+                LoggerUtil.logMessage("User Login Token Type :" + userSession?.accessToken?.jwtToken)*/
                 onLoginRequest(
                     LoginStatus(
                         mLoginFailed = false,

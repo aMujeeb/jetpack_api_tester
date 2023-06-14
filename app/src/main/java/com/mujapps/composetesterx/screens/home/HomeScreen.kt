@@ -24,6 +24,7 @@ import com.mujapps.composetesterx.components.TextFieldMediumBold
 import com.mujapps.composetesterx.components.showToast
 import com.mujapps.composetesterx.models.Student
 import com.mujapps.composetesterx.navigation.TestAppScreens
+import com.mujapps.composetesterx.utils.LoggerUtil
 
 @Composable
 fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewModel = hiltViewModel()) {
@@ -46,7 +47,9 @@ fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewMode
             } else if (mHomeViewState.errorMessage.isNullOrEmpty().not()) {
                 ShowAlertDialog(messageBody = mHomeViewState.errorMessage ?: "", isShow = true)
             } else if (mHomeViewState.isStudentDeleted) {
-                ShowAlertDialog(messageBody = stringResource(id = R.string.deletion_success), isShow = true)
+                ShowAlertDialog(messageBody = stringResource(id = R.string.deletion_success), isShow = true) {
+                    mHomeViewModel.requestStudents()
+                }
             }
 
             GenericButton(
@@ -61,8 +64,6 @@ fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewMode
                     }
                 }
             }
-
-            //mHomeViewModel.checkTokens()
         }
     }
 }
@@ -84,7 +85,7 @@ fun StudentList(studentsList: List<Student>, mHomeViewModel: HomeScreenViewModel
             StudentListItem(student) {
                 //On Click to show toast
                 showToast(mContext, it)
-                mHomeViewModel.onDeleteStudent()
+                mHomeViewModel.onDeleteStudent(student.stId ?: "")
             }
         }
     }

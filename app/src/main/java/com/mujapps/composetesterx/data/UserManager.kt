@@ -14,7 +14,7 @@ class UserManager @Inject constructor(private val mSharedPreferences: SharedPref
 
     //fun getAuthorization() = mSharedPreferences.getString(StudentAppConfig.LOGIN_ACCESS_TOKEN, "")//"allow"//if (mIsAuthenticated) "allow" else "deny"
     fun getAuthorization() : String? {
-        LoggerUtil.logMessage("Token At user :" + mSharedPreferences.getString(StudentAppConfig.LOGIN_ACCESS_TOKEN, ""))
+        //LoggerUtil.logMessage("Token At user :" + mSharedPreferences.getString(StudentAppConfig.LOGIN_ACCESS_TOKEN, ""))
         return mSharedPreferences.getString(StudentAppConfig.LOGIN_ACCESS_TOKEN, "")
     }//"allow"//if (mIsAuthenticated) "allow" else "deny"
 }

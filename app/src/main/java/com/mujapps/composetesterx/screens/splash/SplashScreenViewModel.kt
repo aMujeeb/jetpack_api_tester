@@ -46,17 +46,10 @@ class SplashScreenViewModel @Inject constructor(
     }
 
     private fun checkIsUserLoggedIn() {
-        //viewModelScope.launch {
-        /*mStudentRepo.getCurrentUser() { isSuccess ->
-            LoggerUtil.logMessage("Is User already log In :$isSuccess")
-            mSplashState = mSplashState.copy(isUserExists = isSuccess)
-        }*/
-
         mStudentRepo.getAuthenticatedUser() { isSuccess ->
             LoggerUtil.logMessage("Is User already log In :$isSuccess")
             mSplashState = mSplashState.copy(isUserExists = isSuccess)
         }
-        //}
     }
 
     fun onNavigateAway() {

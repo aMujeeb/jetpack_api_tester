@@ -1,5 +1,6 @@
 package com.mujapps.composetesterx.screens.add_student
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,11 @@ fun AddStudentScreen(navController: NavController?, mAddStudentViewModel: AddStu
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            BackHandler() {
+                navController?.navigate(TestAppScreens.HomeScreen.name)
+            }
+
             TextFieldMediumBold(labelText = stringResource(id = R.string.add_student), modifier = Modifier.padding(top = 24.dp))
             AddStudentForm(mAddStudentViewModel)
         }
@@ -115,7 +121,7 @@ fun AddStudentForm(mAddStudentViewModel: AddStudentViewModel) {
                 .padding(top = 24.dp, start = 24.dp, end = 24.dp)
                 .fillMaxWidth()
         ) {
-            if(!(isAgeValid || isHeightValid || isIncomeValid)) return@GenericButton
+            if (!(isAgeValid || isHeightValid || isIncomeValid)) return@GenericButton
             keyboardController?.hide()
             mAddStudentViewModel.addNewStudentDetails(ageValueState.value.toInt(), heightValueState.value.toFloat(), incomeValueState.value.toFloat())
             ageValueState.value = ""

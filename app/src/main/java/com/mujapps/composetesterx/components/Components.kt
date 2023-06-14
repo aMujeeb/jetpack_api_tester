@@ -434,7 +434,7 @@ fun TextFieldCustom(
 }
 
 @Composable
-fun ShowAlertDialog(isShow: Boolean, title: String = stringResource(id = R.string.alert), messageBody: String) {
+fun ShowAlertDialog(isShow: Boolean, title: String = stringResource(id = R.string.alert), messageBody: String, onClickOk: (Any) -> Unit = {}) {
     val openDialog = remember { mutableStateOf(isShow) }
     if (openDialog.value) {
         AlertDialog(
@@ -456,6 +456,7 @@ fun ShowAlertDialog(isShow: Boolean, title: String = stringResource(id = R.strin
                         .padding(bottom = 16.dp, top = 16.dp, start = 8.dp, end = 8.dp)
                         .fillMaxWidth()
                 ) {
+                    onClickOk(1)
                     openDialog.value = false
                 }
             }

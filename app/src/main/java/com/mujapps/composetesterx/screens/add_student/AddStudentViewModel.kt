@@ -6,6 +6,7 @@ import com.mujapps.composetesterx.data.StudentDataRepository
 import com.mujapps.composetesterx.models.Student
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +24,7 @@ class AddStudentViewModel @Inject constructor(
 
     fun addNewStudentDetails(age: Int, height: Float, income: Float) {
         viewModelScope.launch {
-            mStudentRepo.createStudent(Student(age, height, income))
+            mStudentRepo.createStudent(Student(age, height, income, UUID.randomUUID().toString()))
         }
     }
 

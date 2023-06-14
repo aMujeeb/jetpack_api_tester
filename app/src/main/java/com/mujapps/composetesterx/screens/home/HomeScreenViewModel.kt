@@ -6,11 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mujapps.composetesterx.data.Resource
 import com.mujapps.composetesterx.data.StudentDataRepository
 import com.mujapps.composetesterx.models.Student
 import com.mujapps.composetesterx.utils.LoggerUtil
 import com.mujapps.composetesterx.utils.StudentAppConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,6 +36,10 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     init {
+        requestStudents()
+    }
+
+    fun requestStudents() {
         viewModelScope.launch {
             mHomeViewState = mHomeViewState.copy(isLoading = true)
             val resource = mStudentRepo.getStudent("all")
@@ -44,29 +51,30 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    fun checkTokens() {
-        //LoggerUtil.logMessage("Saved Token :" + mSharedPreferences.getString(StudentAppConfig.LOGIN_ACCESS_TOKEN, "NoColasßß"))
-        //mStudentRepo.getAuthenticatedUser()
-    }
+    fun onDeleteStudent(studentId: String) {
+        mStudentRepo.deleteStudent(studentId).onEach { results ->
+            when (results) {
+                is Resource.Success -> {
+                    mHomeViewState = mHomeViewState.copy(isLoading = false, data = null, errorMessage = null, isSuccess = false, isStudentDeleted = true)
+                }
 
-    fun onDeleteStudent() {
-        viewModelScope.launch {
-            mHomeViewState = mHomeViewState.copy(isLoading = true)
-            val resource = mStudentRepo.deleteStudent()
-            mHomeViewState = if (resource.data == true) {
-                mHomeViewState.copy(isLoading = false, data = null, errorMessage = null, isSuccess = true, isStudentDeleted = true)
-            } else {
-                mHomeViewState.copy(
-                    isLoading = false,
-                    data = null,
-                    errorMessage = resource.message ?: "Cannot collect data error",
-                    isStudentDeleted = false
-                )
+                is Resource.Error -> {
+                    mHomeViewState = mHomeViewState.copy(
+                        isLoading = false,
+                        data = null,
+                        errorMessage = results.message ?: "Cannot collect data error",
+                        isStudentDeleted = false
+                    )
+                }
+
+                else -> {
+                    //mSplashState = mSplashState.copy(is = false)
+                }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
     fun onNavigateAway() {
-        mHomeViewState = mHomeViewState.copy(isLoading = false, isSuccess = false, errorMessage = null, data = null)
+        mHomeViewState = mHomeViewState.copy(isLoading = false, isSuccess = false, errorMessage = null, data = null, isStudentDeleted = false)
     }
 }

@@ -32,14 +32,16 @@ class StudentDataRepository @Inject constructor(
     private val mStudentsApiService: StudentsDataApiService,
     private val mAppContext: Context
 ) {
-    suspend fun createStudent(student: Student): Any {
-        val response = try {
-            Resource.Loading(data = true)
-            mStudentsApiService.publishStudent(student)
-        } catch (e: Exception) {
-            return Resource.Error(message = e.message.toString(), data = null)
+    fun createStudent(student: Student): Flow<Resource<MessageResponse>> = flow {
+        try {
+            emit(Resource.Loading<MessageResponse>())
+            val response =mStudentsApiService.publishStudent(student)
+            emit(Resource.Success<MessageResponse>(response))
+        } catch (e: HttpException) {
+            emit(Resource.Error<MessageResponse>(e.message))
+        } catch (e: IOException) {
+            emit(Resource.Error<MessageResponse>(e.message))
         }
-        return Resource.Success(data = response)
     }
 
     fun deleteStudent(studentId : String) : Flow<Resource<MessageResponse>> = flow {

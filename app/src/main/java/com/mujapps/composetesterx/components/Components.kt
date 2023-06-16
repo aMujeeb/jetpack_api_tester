@@ -474,14 +474,14 @@ fun StudentListItem(student: Student, onPressStudent: (String) -> Unit = {}) {
             .padding(top = 8.dp, start = 16.dp, end = 16.dp)
             .clickable { onPressStudent.invoke(student.age.toString()) }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Rounded.Person,
                     contentDescription = stringResource(id = R.string.student_image),
                     modifier = Modifier
                         .padding(4.dp)
-                        .height(24.dp)
-                        .width(24.dp)
+                        .height(44.dp)
+                        .width(44.dp)
                 )
 
                 Spacer(modifier = Modifier.width(4.dp))

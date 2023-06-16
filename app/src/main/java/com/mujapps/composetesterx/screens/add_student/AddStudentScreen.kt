@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -27,8 +28,11 @@ import androidx.navigation.NavController
 import com.mujapps.composetesterx.R
 import com.mujapps.composetesterx.components.GeneralTextInput
 import com.mujapps.composetesterx.components.GenericButton
+import com.mujapps.composetesterx.components.ShowAlertDialog
 import com.mujapps.composetesterx.components.TextFieldMediumBold
 import com.mujapps.composetesterx.navigation.TestAppScreens
+import com.mujapps.composetesterx.screens.home.StudentList
+import com.mujapps.composetesterx.utils.LoggerUtil
 
 @Composable
 fun AddStudentScreen(navController: NavController?, mAddStudentViewModel: AddStudentViewModel = hiltViewModel()) {
@@ -40,6 +44,7 @@ fun AddStudentScreen(navController: NavController?, mAddStudentViewModel: AddStu
         ) {
 
             BackHandler() {
+                mAddStudentViewModel.onNavigateAway()
                 navController?.navigate(TestAppScreens.HomeScreen.name)
             }
 
@@ -56,6 +61,8 @@ fun AddStudentForm(mAddStudentViewModel: AddStudentViewModel) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
+    val mAddStudentState = mAddStudentViewModel.mAddStudentViewState
+
     val ageValueState = rememberSaveable {
         mutableStateOf("")
     }
@@ -68,7 +75,7 @@ fun AddStudentForm(mAddStudentViewModel: AddStudentViewModel) {
         mutableStateOf("")
     }
 
-    val isHeightValid = remember(ageValueState.value) {
+    val isHeightValid = remember(heightValueState.value) {
         heightValueState.value.isNotEmpty() && (heightValueState.value).toFloat() > 0.0
     }
 
@@ -76,7 +83,7 @@ fun AddStudentForm(mAddStudentViewModel: AddStudentViewModel) {
         mutableStateOf("")
     }
 
-    val isIncomeValid = remember(ageValueState.value) {
+    val isIncomeValid = remember(incomeValueState.value) {
         incomeValueState.value.isNotEmpty() && (incomeValueState.value).toFloat() > 0.0
     }
 
@@ -98,7 +105,7 @@ fun AddStudentForm(mAddStudentViewModel: AddStudentViewModel) {
             .padding(top = 20.dp, start = 24.dp, end = 24.dp),
             mImeAction = ImeAction.Next,
             mLabelId = stringResource(id = R.string.height),
-            mKeyBoardType = KeyboardType.Number,
+            mKeyBoardType = KeyboardType.Decimal,
             mOnAction = KeyboardActions {
                 if (!isHeightValid) return@KeyboardActions
                 focusManager.moveFocus(FocusDirection.Down)
@@ -109,7 +116,7 @@ fun AddStudentForm(mAddStudentViewModel: AddStudentViewModel) {
             .padding(top = 20.dp, start = 24.dp, end = 24.dp),
             mImeAction = ImeAction.Done,
             mLabelId = stringResource(id = R.string.income),
-            mKeyBoardType = KeyboardType.Number,
+            mKeyBoardType = KeyboardType.Decimal,
             mOnAction = KeyboardActions {
                 if (!isIncomeValid) return@KeyboardActions
                 focusManager.moveFocus(FocusDirection.Enter)
@@ -128,5 +135,14 @@ fun AddStudentForm(mAddStudentViewModel: AddStudentViewModel) {
             heightValueState.value = ""
             incomeValueState.value = ""
         }
+
+        if (mAddStudentState.isLoading) {
+            CircularProgressIndicator()
+        } else if (mAddStudentState.isSuccess) {
+            ShowAlertDialog(messageBody = stringResource(id = R.string.add_success), isShow = true)
+        } else if (mAddStudentState.errorMessage.isNullOrEmpty().not()) {
+            ShowAlertDialog(messageBody = mAddStudentState.errorMessage ?: "", isShow = true)
+        }
+        LoggerUtil.logMessage("Adding Student View")
     }
 }

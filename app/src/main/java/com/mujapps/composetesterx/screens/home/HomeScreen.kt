@@ -85,7 +85,7 @@ fun StudentList(studentsList: List<Student>, mHomeViewModel: HomeScreenViewModel
             StudentListItem(student) {
                 //On Click to show toast
                 showToast(mContext, it)
-                mHomeViewModel.onDeleteStudent(student.stId ?: "")
+                //mHomeViewModel.onDeleteStudent(student.stId ?: "")
             }
         }
     }

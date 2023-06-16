@@ -11,6 +11,7 @@
     <string name="confirmation">Confirmation</string>
     <string name="confirmation_success">User Confirmation</string>
     <string name="deletion_success">Successfully Deleted</string>
+    <string name="add_success">Successfully Added</string>
     <string name="student_details">Students</string>
     <string name="student_image">Student Image</string>
     <string name="no_students_message">No Students Data Available</string>

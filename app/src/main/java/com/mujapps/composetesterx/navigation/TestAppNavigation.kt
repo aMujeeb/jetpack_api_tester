@@ -8,6 +8,7 @@ import com.mujapps.composetesterx.screens.add_student.AddStudentScreen
 import com.mujapps.composetesterx.screens.login.LoginScreen
 import com.mujapps.composetesterx.screens.splash.SplashScreen
 import com.mujapps.composetesterx.screens.home.HomeScreen
+import com.mujapps.composetesterx.screens.profile.ProfileScreen
 import com.mujapps.composetesterx.screens.sign_up.SignUpScreen
 
 @Composable
@@ -28,6 +29,9 @@ fun TestAppNavigation() {
         }
         composable(TestAppScreens.AddStudentScreen.name) {
             AddStudentScreen(navController = mNavController)
+        }
+        composable(TestAppScreens.ProfileScreen.name) {
+            ProfileScreen(navController = mNavController)
         }
     }
 }

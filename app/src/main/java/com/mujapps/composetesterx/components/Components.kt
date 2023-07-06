@@ -465,14 +465,14 @@ fun ShowAlertDialog(isShow: Boolean, title: String = stringResource(id = R.strin
 }
 
 @Composable
-fun StudentListItem(student: Student, onPressStudent: (String) -> Unit = {}) {
+fun StudentListItem(student: Student, onPressStudent: (String) -> Unit) {
     Card(
         shape = RoundedCornerShape(8.dp),
         backgroundColor = MaterialTheme.colors.surface,
         elevation = 4.dp,
         modifier = Modifier
             .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-            .clickable { onPressStudent.invoke(student.age.toString()) }) {
+            .clickable { onPressStudent.invoke(student.stId.toString()) }) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Icon(

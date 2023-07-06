@@ -9,6 +9,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -16,18 +17,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.mujapps.composetesterx.R
 import com.mujapps.composetesterx.components.GenericButton
 import com.mujapps.composetesterx.components.ShowAlertDialog
 import com.mujapps.composetesterx.components.StudentListItem
 import com.mujapps.composetesterx.components.TextFieldMediumBold
-import com.mujapps.composetesterx.components.showToast
 import com.mujapps.composetesterx.models.Student
 import com.mujapps.composetesterx.navigation.TestAppScreens
-import com.mujapps.composetesterx.utils.LoggerUtil
 
 @Composable
-fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewModel = hiltViewModel()) {
+fun HomeScreen(navController: NavHostController?, mHomeViewModel: HomeScreenViewModel = hiltViewModel()) {
 
     val mHomeViewState = mHomeViewModel.mHomeViewState
 
@@ -43,7 +43,7 @@ fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewMode
             if (mHomeViewState.isLoading) {
                 CircularProgressIndicator()
             } else if (mHomeViewState.isSuccess) {
-                StudentList(mHomeViewState.data ?: emptyList(), mHomeViewModel)
+                StudentList(mHomeViewState.data ?: emptyList(), mHomeViewModel, navController)
             } else if (mHomeViewState.errorMessage.isNullOrEmpty().not()) {
                 ShowAlertDialog(messageBody = mHomeViewState.errorMessage ?: "", isShow = true)
             } else if (mHomeViewState.isStudentDeleted) {
@@ -69,7 +69,7 @@ fun HomeScreen(navController: NavController?, mHomeViewModel: HomeScreenViewMode
 }
 
 @Composable
-fun StudentList(studentsList: List<Student>, mHomeViewModel: HomeScreenViewModel) {
+fun StudentList(studentsList: List<Student>, mHomeViewModel: HomeScreenViewModel, navController: NavHostController?) {
     val mContext = LocalContext.current
     if (studentsList.isEmpty()) {
         Surface(
@@ -84,8 +84,15 @@ fun StudentList(studentsList: List<Student>, mHomeViewModel: HomeScreenViewModel
         for (student in studentsList) {
             StudentListItem(student) {
                 //On Click to show toast
-                showToast(mContext, it)
+                //showToast(mContext, it)
                 //mHomeViewModel.onDeleteStudent(student.stId ?: "")
+                mHomeViewModel.onNavigateAway()
+                navController?.navigate(TestAppScreens.ProfileScreen.name + "/$it") {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
+                //navController?.navigate(TestAppScreens.ProfileScreen.name + "/$it")
             }
         }
     }
